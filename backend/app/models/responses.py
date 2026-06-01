@@ -13,7 +13,7 @@ class InvestmentResearchBrief(StrictBaseModel):
     generated_at: datetime
     sections: list[ReportSection]
     evidence: list[Evidence]
-    verification: VerifierOutput
+    verification: VerifierOutput | None = None
     disclaimer: str = Field(
         default="This research brief is for informational purposes only and is not financial advice."
     )

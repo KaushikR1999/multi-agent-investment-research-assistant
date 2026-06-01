@@ -81,5 +81,5 @@ Findings include a check name, message, severity, optional claim text, and relat
 - generated timestamp
 - required report sections
 - evidence list
-- verification output
+- optional verification output, so draft briefs can be represented before verifier execution
 - non-advice disclaimer
