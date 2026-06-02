@@ -60,6 +60,27 @@ Specialized worker schemas add domain fields:
 - `FundamentalsOutput`: valuation, profitability, balance sheet metrics
 - `RiskOutput`: categorized risk items
 
+## Market Data Agent
+
+The market data agent reads quote fields from `yfinance` and maps each available numeric metric into:
+
+- one `Evidence` record with the raw provider field and value
+- one `MetricValue` referencing that evidence through `evidence_id`
+- one `Claim` referencing the same evidence ID
+
+The agent uses these yfinance fields:
+
+- `currentPrice` or `regularMarketPrice`
+- `previousClose` or `regularMarketPreviousClose`
+- `fiftyTwoWeekHigh`
+- `fiftyTwoWeekLow`
+- `marketCap`
+- `volume` or `regularMarketVolume`
+- `currency`
+- `regularMarketTime`
+
+The derived price-change percentage is calculated only when current price and previous close are both available. Missing fields are represented as `MetricValue` objects with `unavailable_reason`, warnings, and no fabricated numeric claims.
+
 ## Verifier Output
 
 The verifier returns:
