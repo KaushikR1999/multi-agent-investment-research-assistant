@@ -122,6 +122,25 @@ Each available fundamentals metric becomes:
 
 Percent-style fields such as margins and revenue growth preserve the raw yfinance value in evidence and store the display percentage in `MetricValue`. Missing fields are represented as unavailable metrics plus warnings, without creating unsupported claims.
 
+## News Retrieval Service
+
+The news retrieval service fetches and normalizes articles only. It does not perform sentiment analysis and does not call an LLM.
+
+The MVP provider is NewsAPI.org's `/v2/everything` endpoint. The implementation is behind a `NewsProvider` protocol so another web or news search API can replace it later.
+
+Each raw article is normalized into:
+
+- `NewsArticle.title`
+- `NewsArticle.url`
+- `NewsArticle.publisher`
+- `NewsArticle.published_at`
+- `NewsArticle.snippet`
+- `NewsArticle.evidence_id`
+
+Each article also becomes one `Evidence` record with `source_type="news"`. The evidence `data` stores the normalized fields, provider name, and raw provider payload when available.
+
+Missing API keys, rate limits, authentication failures, network failures, provider errors, empty results, and unusable articles are represented as warnings in `NewsRetrievalResult`. Tests use fake providers and mocked HTTP responses; no live news API calls are required.
+
 ## Verifier Output
 
 The verifier returns:
