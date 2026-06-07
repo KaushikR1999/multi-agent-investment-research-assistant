@@ -81,6 +81,47 @@ The agent uses these yfinance fields:
 
 The derived price-change percentage is calculated only when current price and previous close are both available. Missing fields are represented as `MetricValue` objects with `unavailable_reason`, warnings, and no fabricated numeric claims.
 
+## Fundamentals Agent
+
+The fundamentals agent reads company fundamentals from `yfinance` and groups metrics into valuation, profitability, and balance sheet categories.
+
+Valuation fields:
+
+- `trailingPE`
+- `forwardPE`
+- `priceToSalesTrailing12Months`
+- `priceToBook`
+- `enterpriseToRevenue`
+- `enterpriseToEbitda`
+
+Profitability fields:
+
+- `totalRevenue`
+- `revenueGrowth`
+- `grossMargins`
+- `operatingMargins`
+- `profitMargins`
+- `returnOnEquity`
+- `returnOnAssets`
+
+Balance sheet fields:
+
+- `totalCash`
+- `totalDebt`
+- `debtToEquity`
+- `currentRatio`
+- `quickRatio`
+- `freeCashflow`
+- `operatingCashflow`
+
+Each available fundamentals metric becomes:
+
+- one `Evidence` record with raw yfinance field/value
+- one `MetricValue` in the relevant category list
+- one `Claim` citing the same evidence ID
+
+Percent-style fields such as margins and revenue growth preserve the raw yfinance value in evidence and store the display percentage in `MetricValue`. Missing fields are represented as unavailable metrics plus warnings, without creating unsupported claims.
+
 ## Verifier Output
 
 The verifier returns:
