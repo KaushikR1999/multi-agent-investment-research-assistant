@@ -172,6 +172,43 @@ Grounding rules:
 
 If the LLM API key is missing, the LLM call fails, or the LLM returns malformed JSON, the agent returns `sentiment="unavailable"`, low confidence, copied article evidence, no claims, and warnings explaining the failure.
 
+## Risk Agent
+
+The risk agent consumes prior worker outputs only:
+
+- `MarketDataOutput`
+- `FundamentalsOutput`
+- `NewsSentimentOutput`
+
+It does not call market, fundamentals, news, or other external APIs directly. It uses the shared `LLMClient` abstraction for analysis.
+
+Outputs:
+
+- `summary`
+- categorized `risks`
+- top-level grounded `claims`
+- copied evidence from prior agents
+- warnings
+- confidence
+
+Allowed risk categories:
+
+- `market`
+- `valuation`
+- `financial`
+- `news`
+- `business`
+
+Grounding rules:
+
+- The prompt supplies only prior-agent summaries, claims, warnings, and evidence IDs.
+- Every LLM-returned claim must cite evidence from prior-agent outputs.
+- Claims with missing or unknown evidence IDs are dropped.
+- Risk categories with no grounded claims are dropped.
+- The agent must explain conflicting signals cautiously rather than turning them into recommendations.
+
+If required inputs are missing, the LLM fails, or output is malformed, the agent returns low confidence with warnings and no unsupported claims.
+
 ## Verifier Output
 
 The verifier returns:

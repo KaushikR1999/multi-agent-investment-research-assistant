@@ -6,7 +6,7 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 7:
+Implemented through Ticket 8:
 
 - FastAPI backend package
 - `GET /health` endpoint
@@ -18,6 +18,7 @@ Implemented through Ticket 7:
 - Fundamentals agent
 - News retrieval service
 - News sentiment agent using an abstracted LLM client
+- Risk agent using prior agent outputs and an abstracted LLM client
 - Offline tests for implemented services and agents
 
 ## Setup
@@ -32,7 +33,7 @@ cp .env.example .env
 Configure API keys as needed:
 
 - `NEWS_API_KEY` for live news retrieval
-- `OPENAI_API_KEY` and `OPENAI_MODEL` for live news sentiment analysis
+- `OPENAI_API_KEY` and `OPENAI_MODEL` for live LLM-backed news sentiment and risk analysis
 
 Tests use fakes/mocks and do not require live API keys.
 
