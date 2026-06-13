@@ -6,20 +6,39 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 8:
+Implemented through Ticket 9:
 
-- FastAPI backend package
-- `GET /health` endpoint
-- Streamlit placeholder app
-- Project plan
+- Project scaffold, FastAPI health endpoint, and Streamlit placeholder
 - Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
 - Ticker/company resolver
-- Market data agent
-- Fundamentals agent
-- News retrieval service
-- News sentiment agent using an abstracted LLM client
-- Risk agent using prior agent outputs and an abstracted LLM client
+- Market data and fundamentals agents using `yfinance`
+- News retrieval service using a provider abstraction
+- LLM-backed news sentiment, risk, and research synthesis agents
+- Draft `InvestmentResearchBrief` generation with evidence-grounded section claims
 - Offline tests for implemented services and agents
+
+## Architecture Progress
+
+Complete:
+
+- Backend scaffold and health endpoint
+- Streamlit scaffold
+- Structured Pydantic contracts
+- Ticker/company resolution
+- Market data worker
+- Fundamentals worker
+- News retrieval service
+- News sentiment worker
+- Risk worker
+- Draft research synthesizer
+
+Remaining:
+
+- Verifier Agent for grounding, contradiction, and advice-wording checks
+- LangGraph workflow wiring
+- `POST /research` FastAPI endpoint
+- Streamlit report UI
+- Final MVP documentation pass
 
 ## Setup
 
@@ -33,7 +52,7 @@ cp .env.example .env
 Configure API keys as needed:
 
 - `NEWS_API_KEY` for live news retrieval
-- `OPENAI_API_KEY` and `OPENAI_MODEL` for live LLM-backed news sentiment and risk analysis
+- `OPENAI_API_KEY` and `OPENAI_MODEL` for live LLM-backed news sentiment, risk analysis, and synthesis
 
 Tests use fakes/mocks and do not require live API keys.
 

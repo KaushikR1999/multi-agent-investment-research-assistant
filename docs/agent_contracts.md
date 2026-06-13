@@ -209,6 +209,45 @@ Grounding rules:
 
 If required inputs are missing, the LLM fails, or output is malformed, the agent returns low confidence with warnings and no unsupported claims.
 
+## Research Synthesizer Agent
+
+The research synthesizer consumes prior worker outputs and produces a draft `InvestmentResearchBrief`.
+
+Inputs:
+
+- `ResolvedCompany`
+- `MarketDataOutput`
+- `FundamentalsOutput`
+- `NewsSentimentOutput`
+- `RiskOutput`
+
+Outputs:
+
+- draft `InvestmentResearchBrief`
+- required report sections
+- copied upstream evidence
+- section-level claims
+- `verification=None`
+
+Required draft sections:
+
+- Company / ticker identified
+- Market data summary
+- Recent news sentiment
+- Fundamentals summary
+- Key risks
+- Bull case
+- Bear case
+- Balanced view
+
+Grounding rules:
+
+- The prompt supplies only upstream summaries, claims, warnings, and evidence IDs.
+- Every generated claim must cite upstream evidence.
+- Claims with missing or unknown evidence IDs are removed before the draft is returned.
+- Conflicting signals should be represented as tensions, not recommendations.
+- The draft is intentionally unverified; the verifier will check grounding, contradictions, and advice wording in a later ticket.
+
 ## Verifier Output
 
 The verifier returns:

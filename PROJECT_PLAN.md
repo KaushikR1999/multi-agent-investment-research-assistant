@@ -95,7 +95,7 @@ The verifier should explicitly check `claim -> evidence` mapping. Every major cl
 
 ## Ticket List
 
-### Ticket 1: Project Scaffold
+### Ticket 1: Project Scaffold - Complete
 
 Create the backend/frontend folder structure, dependency file, `.env.example`, README, and minimal health endpoint.
 
@@ -107,7 +107,7 @@ Acceptance criteria:
 - FastAPI exposes `GET /health`.
 - A basic test verifies the health endpoint.
 
-### Ticket 2: Pydantic Schemas
+### Ticket 2: Pydantic Schemas - Complete
 
 Define request, response, graph state, evidence, claim, worker output, verifier output, and final report models.
 
@@ -117,7 +117,7 @@ Acceptance criteria:
 - Final response shape matches frontend needs.
 - Evidence and claims can be linked by IDs.
 
-### Ticket 3: Ticker / Company Resolver
+### Ticket 3: Ticker / Company Resolver - Complete
 
 Implement query parsing for ticker or company name.
 
@@ -128,7 +128,7 @@ Acceptance criteria:
 - Unknown input returns a controlled error.
 - Resolver emits evidence/source metadata for identification.
 
-### Ticket 4: Market Data Agent
+### Ticket 4: Market Data Agent - Complete
 
 Use `yfinance` to fetch and summarize market data.
 
@@ -138,7 +138,7 @@ Acceptance criteria:
 - Every numeric claim has evidence.
 - Missing fields are handled gracefully.
 
-### Ticket 5: Fundamentals Agent
+### Ticket 5: Fundamentals Agent - Complete
 
 Use `yfinance` fundamentals fields.
 
@@ -148,7 +148,7 @@ Acceptance criteria:
 - Missing data is explicitly marked unavailable.
 - Claims cite fundamentals evidence.
 
-### Ticket 6: News Retrieval Service
+### Ticket 6: News Retrieval Service - Complete
 
 Create a News API or web search adapter.
 
@@ -158,7 +158,7 @@ Acceptance criteria:
 - Handles missing API key clearly.
 - Empty result paths are tested.
 
-### Ticket 7: News Sentiment Agent
+### Ticket 7: News Sentiment Agent - Complete
 
 Use retrieved news and LLM analysis to classify sentiment.
 
@@ -168,7 +168,7 @@ Acceptance criteria:
 - Output avoids overstating impact.
 - No-news cases return unavailable rather than hallucinated analysis.
 
-### Ticket 8: Risk Agent
+### Ticket 8: Risk Agent - Complete
 
 Generate key risks using available market data, fundamentals, news, and company profile.
 
@@ -178,7 +178,31 @@ Acceptance criteria:
 - General risks are labeled as lower confidence.
 - Unsupported risk claims can be flagged by the verifier.
 
-### Ticket 9: LangGraph Workflow
+### Ticket 9: Research Synthesizer Agent - Complete
+
+Create a draft research brief from resolved company, market data, fundamentals, news sentiment, and risk outputs.
+
+Acceptance criteria:
+
+- Produces all required draft sections.
+- Avoids buy/sell/hold recommendations.
+- Preserves uncertainty and conflicting signals.
+- Every generated claim cites upstream evidence.
+- Returns `InvestmentResearchBrief` with `verification=None`.
+
+### Ticket 10: Verifier Agent
+
+Implement verification checks for grounding and safety.
+
+Acceptance criteria:
+
+- Flags claims without evidence.
+- Flags contradictory numbers.
+- Flags direct recommendation language.
+- Flags missing sources or missing disclaimer.
+- Returns severity levels and structured verification notes.
+
+### Ticket 11: LangGraph Workflow
 
 Implement typed graph nodes:
 
@@ -197,28 +221,6 @@ Acceptance criteria:
 - Graph state is typed.
 - Partial worker failures do not crash the whole report unless ticker resolution fails.
 - Final report includes verification notes.
-
-### Ticket 10: Orchestrator Synthesis
-
-Create the first draft brief from worker outputs inside graph nodes.
-
-Acceptance criteria:
-
-- Produces all required sections.
-- Avoids buy/sell/hold recommendations.
-- Uses cautious language.
-- Includes a disclaimer.
-
-### Ticket 11: Verifier Agent
-
-Implement verification checks for grounding and safety.
-
-Acceptance criteria:
-
-- Flags claims without evidence.
-- Flags contradictory numbers.
-- Flags direct recommendation language.
-- Returns severity levels.
 
 ### Ticket 12: FastAPI Research Endpoint
 
