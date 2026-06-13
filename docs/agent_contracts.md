@@ -141,6 +141,37 @@ Each article also becomes one `Evidence` record with `source_type="news"`. The e
 
 Missing API keys, rate limits, authentication failures, network failures, provider errors, empty results, and unusable articles are represented as warnings in `NewsRetrievalResult`. Tests use fake providers and mocked HTTP responses; no live news API calls are required.
 
+## News Sentiment Agent
+
+The news sentiment agent consumes `NewsRetrievalResult` and produces `NewsSentimentOutput`. It does not call the news API directly.
+
+Inputs:
+
+- normalized `NewsArticle` records
+- article `Evidence` records
+- retrieval warnings
+
+Outputs:
+
+- `sentiment`: `positive`, `neutral`, `negative`, `mixed`, or `unavailable`
+- `summary`
+- `themes`
+- `claims`
+- copied article evidence
+- warnings
+- confidence
+
+The MVP implementation uses an abstract `LLMClient` with an OpenAI-backed concrete client. Tests use fake LLM clients and never call a live LLM.
+
+Grounding rules:
+
+- The prompt instructs the LLM to cite only supplied article evidence IDs.
+- The agent validates all returned claim evidence IDs.
+- Claims with no retrieved evidence IDs are dropped and converted into warnings.
+- No claim is emitted unless it cites at least one retrieved article evidence ID.
+
+If the LLM API key is missing, the LLM call fails, or the LLM returns malformed JSON, the agent returns `sentiment="unavailable"`, low confidence, copied article evidence, no claims, and warnings explaining the failure.
+
 ## Verifier Output
 
 The verifier returns:

@@ -14,14 +14,18 @@ from backend.app.services.ticker_resolver import (
     TickerResolver,
     TickerSearchCandidate,
 )
+from backend.app.services.llm import LLMClient, LLMServiceError, OpenAILLMClient
 
 __all__ = [
+    "LLMClient",
+    "LLMServiceError",
     "NewsAPIProvider",
     "NewsProvider",
     "NewsProviderError",
     "NewsRetrievalResult",
     "NewsRetrievalService",
     "RawNewsArticle",
+    "OpenAILLMClient",
     "TickerLookupProvider",
     "TickerResolutionError",
     "TickerResolver",

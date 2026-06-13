@@ -6,13 +6,19 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Ticket 1 scaffold is implemented:
+Implemented through Ticket 7:
 
 - FastAPI backend package
 - `GET /health` endpoint
 - Streamlit placeholder app
 - Project plan
-- Basic backend test
+- Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
+- Ticker/company resolver
+- Market data agent
+- Fundamentals agent
+- News retrieval service
+- News sentiment agent using an abstracted LLM client
+- Offline tests for implemented services and agents
 
 ## Setup
 
@@ -22,6 +28,13 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env
 ```
+
+Configure API keys as needed:
+
+- `NEWS_API_KEY` for live news retrieval
+- `OPENAI_API_KEY` and `OPENAI_MODEL` for live news sentiment analysis
+
+Tests use fakes/mocks and do not require live API keys.
 
 ## Run Backend
 
