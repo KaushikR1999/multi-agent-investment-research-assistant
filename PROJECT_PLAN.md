@@ -190,7 +190,7 @@ Acceptance criteria:
 - Every generated claim cites upstream evidence.
 - Returns `InvestmentResearchBrief` with `verification=None`.
 
-### Ticket 10: Verifier Agent
+### Ticket 10: Verifier Agent - Complete
 
 Implement verification checks for grounding and safety.
 

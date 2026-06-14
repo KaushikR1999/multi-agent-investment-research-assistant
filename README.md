@@ -6,7 +6,7 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 9:
+Implemented through Ticket 10:
 
 - Project scaffold, FastAPI health endpoint, and Streamlit placeholder
 - Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
@@ -15,6 +15,7 @@ Implemented through Ticket 9:
 - News retrieval service using a provider abstraction
 - LLM-backed news sentiment, risk, and research synthesis agents
 - Draft `InvestmentResearchBrief` generation with evidence-grounded section claims
+- Rule-based verifier for grounding, evidence consistency, contradictions, completeness, and advice wording
 - Offline tests for implemented services and agents
 
 ## Architecture Progress
@@ -31,10 +32,10 @@ Complete:
 - News sentiment worker
 - Risk worker
 - Draft research synthesizer
+- Verifier Agent
 
 Remaining:
 
-- Verifier Agent for grounding, contradiction, and advice-wording checks
 - LangGraph workflow wiring
 - `POST /research` FastAPI endpoint
 - Streamlit report UI

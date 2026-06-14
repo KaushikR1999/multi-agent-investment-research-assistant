@@ -1,6 +1,6 @@
 # Architecture
 
-The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 9.
+The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 10.
 
 Implemented:
 
@@ -13,10 +13,10 @@ Implemented:
 - News sentiment agent
 - Risk agent
 - Research synthesizer agent for draft briefs
+- Rule-based verifier agent
 
 Remaining:
 
-- Verifier Agent
 - LangGraph workflow wiring
 - FastAPI `/research` endpoint
 - Streamlit report UI

@@ -246,7 +246,36 @@ Grounding rules:
 - Every generated claim must cite upstream evidence.
 - Claims with missing or unknown evidence IDs are removed before the draft is returned.
 - Conflicting signals should be represented as tensions, not recommendations.
-- The draft is intentionally unverified; the verifier will check grounding, contradictions, and advice wording in a later ticket.
+- The draft is intentionally unverified; the verifier checks grounding, contradictions, and advice wording in a later step.
+
+## Verifier Agent
+
+The verifier consumes a draft `InvestmentResearchBrief`, report evidence, and optionally prior agent outputs. It produces `VerifierOutput` only; it does not modify the report.
+
+Checks are deterministic and rule-based:
+
+- claim grounding
+- unknown evidence IDs
+- duplicate evidence IDs
+- obvious contradiction patterns
+- direct advice wording
+- required section completeness
+- disclaimer presence
+- non-empty evidence list
+
+Unsupported claim counting:
+
+- A material claim with no evidence IDs counts as unsupported.
+- A claim whose evidence IDs are all unknown counts as unsupported.
+- A claim with both known and unknown evidence IDs is flagged, but not counted as fully unsupported.
+
+Severity:
+
+- `error`: missing required sections, empty evidence, missing disclaimer, unknown evidence references, direct advice wording
+- `warning`: unsupported claims, duplicate evidence IDs, potential contradictions
+- `info`: reserved for non-blocking completeness notes
+
+The verifier intentionally avoids LLM judgment for the MVP so checks remain explicit, fast, and testable.
 
 ## Verifier Output
 
