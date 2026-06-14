@@ -268,7 +268,7 @@ Checks are deterministic and rule-based:
 
 - claim grounding
 - unknown evidence IDs
-- duplicate evidence IDs
+- conflicting reuse of evidence IDs
 - obvious contradiction patterns
 - direct advice wording
 - required section completeness
@@ -284,7 +284,7 @@ Unsupported claim counting:
 Severity:
 
 - `error`: missing required sections, empty evidence, missing disclaimer, unknown evidence references, direct advice wording
-- `warning`: unsupported claims, duplicate evidence IDs, potential contradictions
+- `warning`: unsupported claims, conflicting evidence ID reuse, potential contradictions
 - `info`: reserved for non-blocking completeness notes
 
 The verifier intentionally avoids LLM judgment for the MVP so checks remain explicit, fast, and testable.

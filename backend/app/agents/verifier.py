@@ -1,3 +1,4 @@
+import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -54,10 +55,10 @@ CONTRADICTION_PATTERNS = (
 )
 
 METRIC_PATTERNS = {
-    "current_price": r"(?:current price|price)\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
+    "current_price": r"\bcurrent price\b\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
     "previous_close": r"previous close\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
     "market_cap": r"market cap(?:italization)?\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
-    "trailing_pe": r"trailing p/e\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
+    "trailing_pe": r"trailing p/?e\D{0,30}(-?\d+(?:,\d{3})*(?:\.\d+)?)",
 }
 
 
@@ -147,19 +148,19 @@ class VerifierAgent:
 
     @staticmethod
     def _check_duplicate_evidence_ids(evidence_records: list[Evidence]) -> list[VerificationFinding]:
-        counts: dict[str, int] = defaultdict(int)
+        records_by_id: dict[str, set[str]] = defaultdict(set)
         for evidence in evidence_records:
-            counts[evidence.id] += 1
+            records_by_id[evidence.id].add(_evidence_fingerprint(evidence))
 
         return [
             VerificationFinding(
                 check_name="evidence_consistency",
-                message=f"Evidence ID appears multiple times: {evidence_id}.",
+                message=f"Evidence ID is reused for conflicting records: {evidence_id}.",
                 severity=Severity.WARNING,
                 evidence_ids=[evidence_id],
             )
-            for evidence_id, count in counts.items()
-            if count > 1
+            for evidence_id, fingerprints in records_by_id.items()
+            if len(fingerprints) > 1
         ]
 
     def _check_claim_grounding(
@@ -285,3 +286,16 @@ def _parse_number(value: str) -> float | None:
         return float(value.replace(",", ""))
     except ValueError:
         return None
+
+
+def _evidence_fingerprint(evidence: Evidence) -> str:
+    return json.dumps(
+        evidence.model_dump(
+            exclude={
+                "retrieved_at",
+            },
+            exclude_none=True,
+            mode="json",
+        ),
+        sort_keys=True,
+    )

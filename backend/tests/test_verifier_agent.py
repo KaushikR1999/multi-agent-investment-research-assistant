@@ -209,6 +209,38 @@ def test_verifier_detects_inconsistent_metric_values() -> None:
     assert any("current price" in f.message for f in output.findings)
 
 
+def test_verifier_does_not_treat_unrelated_price_values_as_current_price_conflicts() -> None:
+    verifier = VerifierAgent()
+    brief = make_brief(
+        summaries_by_heading={
+            "Market data summary": "The current price was 210.25 USD.",
+            "Bull case": "Analysts discussed a possible price target of 250.00 USD.",
+            "Bear case": "The product price increased to 999.00 USD in one market.",
+        }
+    )
+
+    output = verifier.run(brief)
+
+    assert output.contradiction_count == 0
+    assert not any("current price" in f.message for f in output.findings)
+
+
+def test_verifier_does_not_treat_unrelated_valuation_numbers_as_trailing_pe_conflicts() -> None:
+    verifier = VerifierAgent()
+    brief = make_brief(
+        summaries_by_heading={
+            "Fundamentals summary": "The trailing P/E was 31.50x.",
+            "Bull case": "The valuation discussion cited revenue growth of 8.00%.",
+            "Bear case": "The valuation discussion cited market cap above 3,000.00 billion USD.",
+        }
+    )
+
+    output = verifier.run(brief)
+
+    assert output.contradiction_count == 0
+    assert not any("trailing pe" in f.message for f in output.findings)
+
+
 def test_verifier_flags_empty_evidence_and_missing_disclaimer() -> None:
     verifier = VerifierAgent()
     brief = make_brief(evidence=[], disclaimer=" ")
@@ -220,14 +252,24 @@ def test_verifier_flags_empty_evidence_and_missing_disclaimer() -> None:
     assert any("disclaimer is missing" in f.message for f in output.findings)
 
 
-def test_verifier_flags_duplicate_evidence_ids_from_additional_evidence() -> None:
+def test_verifier_allows_reused_identical_evidence_ids_from_upstream_outputs() -> None:
     verifier = VerifierAgent()
     brief = make_brief()
 
     output = verifier.run(brief, evidence=[make_evidence()[0]])
 
+    assert not any("conflicting records" in f.message for f in output.findings)
+
+
+def test_verifier_flags_reused_evidence_ids_with_conflicting_records() -> None:
+    verifier = VerifierAgent()
+    brief = make_brief()
+    conflicting_evidence = make_evidence()[0].model_copy(update={"title": "Different ticker resolution"})
+
+    output = verifier.run(brief, evidence=[conflicting_evidence])
+
     assert any(f.check_name == "evidence_consistency" for f in output.findings)
-    assert any("appears multiple times" in f.message for f in output.findings)
+    assert any("conflicting records" in f.message for f in output.findings)
 
 
 def test_investment_research_brief_schema_rejects_missing_required_sections() -> None:
