@@ -277,6 +277,20 @@ Severity:
 
 The verifier intentionally avoids LLM judgment for the MVP so checks remain explicit, fast, and testable.
 
+## LangGraph Workflow
+
+The workflow uses `ResearchGraphState` as the shared state object. Nodes update only their owned portions of state:
+
+- `parse_query`: normalized request
+- `resolve_ticker`: `resolved_company` or terminal error
+- `parallel_workers`: `market_data`, `fundamentals`, and `news_sentiment`
+- `risk`: `risks`
+- `research_synthesizer`: `draft_brief`
+- `verifier`: `verification`
+- `final_response`: `final_brief`
+
+Ticker resolution errors stop the graph before worker execution. Downstream worker errors are appended to `state.errors`, and the workflow continues with the best available outputs.
+
 ## Verifier Output
 
 The verifier returns:

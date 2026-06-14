@@ -202,7 +202,7 @@ Acceptance criteria:
 - Flags missing sources or missing disclaimer.
 - Returns severity levels and structured verification notes.
 
-### Ticket 11: LangGraph Workflow
+### Ticket 11: LangGraph Workflow - Complete
 
 Implement typed graph nodes:
 

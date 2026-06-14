@@ -1,6 +1,6 @@
 # Architecture
 
-The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 10.
+The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 11.
 
 Implemented:
 
@@ -14,10 +14,26 @@ Implemented:
 - Risk agent
 - Research synthesizer agent for draft briefs
 - Rule-based verifier agent
+- LangGraph workflow wiring
 
 Remaining:
 
-- LangGraph workflow wiring
 - FastAPI `/research` endpoint
 - Streamlit report UI
 - Final documentation pass
+
+## Current Workflow
+
+The typed LangGraph workflow uses `ResearchGraphState` and runs:
+
+```text
+parse_query
+-> resolve_ticker
+-> parallel_workers
+-> risk
+-> research_synthesizer
+-> verifier
+-> final_response
+```
+
+The `parallel_workers` node runs market data, fundamentals, and news retrieval/sentiment concurrently. Ticker resolution failure terminates gracefully before worker execution. Downstream worker failures are recorded in `state.errors`, while later nodes continue with the best available outputs.
