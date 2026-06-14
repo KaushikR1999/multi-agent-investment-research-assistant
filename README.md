@@ -169,7 +169,8 @@ The verifier is deterministic and rule-based. It checks report completeness, cla
 
 ## Screenshots
 
-Placeholder: add screenshots after the final MVP UI review.
+<img width="2048" height="1042" alt="Screenshot 2026-06-14 at 11 58 40 PM" src="https://github.com/user-attachments/assets/df46c3ba-861b-4a79-a96a-8538646d80b3" />
+<img width="2048" height="1013" alt="Screenshot 2026-06-14 at 11 59 17 PM" src="https://github.com/user-attachments/assets/45e563d2-d53e-48c2-bfac-3f098b775912" />
 
 ## Tests
 
