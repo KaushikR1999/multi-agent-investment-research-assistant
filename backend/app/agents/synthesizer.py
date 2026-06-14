@@ -12,7 +12,8 @@ from backend.app.models.agent_outputs import (
 from backend.app.models.common import AgentWarning, Claim, ConfidenceLevel, Evidence, ReportSection, StrictBaseModel
 from backend.app.models.graph_state import ResolvedCompany
 from backend.app.models.responses import InvestmentResearchBrief
-from backend.app.services.llm import LLMClient, LLMServiceError, OpenAILLMClient
+from backend.app.config import get_settings
+from backend.app.services.llm import LLMClient, LLMServiceError, build_llm_client
 
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "synthesis.md"
@@ -46,8 +47,11 @@ class _LLMSynthesisResponse(StrictBaseModel):
 
 class ResearchSynthesizerAgent:
     def __init__(self, llm_client: LLMClient | None = None, prompt_template: str | None = None) -> None:
-        self.llm_client = llm_client or OpenAILLMClient()
+        settings = get_settings()
+        self.llm_client = llm_client or build_llm_client()
         self.prompt_template = prompt_template if prompt_template is not None else PROMPT_PATH.read_text()
+        self.max_claims_per_output = settings.synthesis_max_claims_per_output
+        self.max_evidence_items = settings.synthesis_max_evidence_items
 
     def run(
         self,
@@ -72,7 +76,7 @@ class ResearchSynthesizerAgent:
         )
 
         try:
-            raw_response = self.llm_client.generate_json(prompt)
+            raw_response = self.llm_client.generate_json(prompt, call_name="research_synthesizer")
             parsed = _LLMSynthesisResponse.model_validate(raw_response)
         except LLMServiceError as exc:
             return self._fallback_brief(
@@ -192,19 +196,22 @@ class ResearchSynthesizerAgent:
             f"Exchange: {company.exchange or 'unknown'}",
             "",
             "Allowed evidence IDs:",
-            "\n".join(f"- {item.id}: {item.source_type} | {item.title}" for item in evidence),
+            "\n".join(
+                f"- {item.id}: {item.source_type} | {self._truncate(item.title, 120)}"
+                for item in evidence[: self.max_evidence_items]
+            ),
             "",
             "Market data output:",
-            self._format_output(market_data),
+            self._format_output(market_data, max_claims=self.max_claims_per_output),
             "",
             "Fundamentals output:",
-            self._format_output(fundamentals),
+            self._format_output(fundamentals, max_claims=self.max_claims_per_output),
             "",
             "News sentiment output:",
-            self._format_output(news_sentiment),
+            self._format_output(news_sentiment, max_claims=self.max_claims_per_output),
             "",
             "Risk output:",
-            self._format_output(risks),
+            self._format_output(risks, max_claims=self.max_claims_per_output),
             "",
             "Upstream warnings:",
             self._format_warnings(warnings),
@@ -214,25 +221,39 @@ class ResearchSynthesizerAgent:
     @staticmethod
     def _format_output(
         output: MarketDataOutput | FundamentalsOutput | NewsSentimentOutput | RiskOutput | None,
+        max_claims: int,
     ) -> str:
         if output is None:
             return "unavailable"
 
-        lines = [f"summary: {output.summary}", f"confidence: {output.confidence}"]
+        lines = [
+            f"summary: {ResearchSynthesizerAgent._truncate(output.summary, 700)}",
+            f"confidence: {output.confidence}",
+        ]
         if isinstance(output, NewsSentimentOutput):
             lines.append(f"sentiment: {output.sentiment}")
             if output.themes:
                 lines.append(f"themes: {', '.join(output.themes)}")
         if isinstance(output, RiskOutput) and output.risks:
             lines.append("risks:")
-            for risk in output.risks:
-                lines.append(f"- {risk.category}: {risk.description}")
+            for risk in output.risks[:max_claims]:
+                lines.append(f"- {risk.category}: {ResearchSynthesizerAgent._truncate(risk.description, 300)}")
 
         if output.claims:
             lines.append("claims:")
-            for claim in output.claims:
-                lines.append(f"- {claim.text} evidence_ids={claim.evidence_ids}")
+            for claim in output.claims[:max_claims]:
+                lines.append(
+                    f"- {ResearchSynthesizerAgent._truncate(claim.text, 300)} "
+                    f"evidence_ids={claim.evidence_ids}"
+                )
         return "\n".join(lines)
+
+    @staticmethod
+    def _truncate(value: str, max_chars: int) -> str:
+        normalized = " ".join(str(value).split())
+        if len(normalized) <= max_chars:
+            return normalized
+        return f"{normalized[: max_chars - 3].rstrip()}..."
 
     @staticmethod
     def _format_warnings(warnings: list[AgentWarning]) -> str:

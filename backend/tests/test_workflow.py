@@ -75,7 +75,24 @@ class TimedAgent:
 
 
 class FakeNewsRetrievalService:
-    def retrieve(self, query: str) -> NewsRetrievalResult:
+    def __init__(self) -> None:
+        self.calls: list[dict] = []
+
+    def retrieve(
+        self,
+        query: str,
+        page_size: int = 5,
+        company_name: str | None = None,
+        ticker: str | None = None,
+    ) -> NewsRetrievalResult:
+        self.calls.append(
+            {
+                "query": query,
+                "page_size": page_size,
+                "company_name": company_name,
+                "ticker": ticker,
+            }
+        )
         return NewsRetrievalResult(
             articles=[],
             evidence=[

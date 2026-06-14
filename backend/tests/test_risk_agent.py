@@ -22,7 +22,7 @@ class FakeLLMClient:
         self.error = error
         self.prompts: list[str] = []
 
-    def generate_json(self, prompt: str) -> dict:
+    def generate_json(self, prompt: str, call_name: str = "llm") -> dict:
         self.prompts.append(prompt)
         if self.error:
             raise self.error

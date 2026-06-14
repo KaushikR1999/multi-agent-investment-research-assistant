@@ -93,6 +93,17 @@ The verifier should explicitly check `claim -> evidence` mapping. Every major cl
 - Minimal LangChain only if useful for wrappers or prompt utilities
 - Pytest for backend tests
 
+## Current Implementation Status
+
+Implemented through the Streamlit MVP flow with additional runtime hardening:
+
+- FastAPI `/research` endpoint and Streamlit UI are wired to the LangGraph workflow.
+- OpenAI and Gemini are available through the shared `LLMClient` interface.
+- `LLM_PROVIDER=openai` and `LLM_PROVIDER=gemini` both have tests proving the default LLM-backed agents instantiate the expected client.
+- LLM provider calls log agent name, input character count, approximate token count, requested output token limit, provider/model, HTTP status, duration, and normalized error code.
+- `scripts/debug_llm_call.py` performs one configured-provider JSON call for isolating quota, auth, model, or network issues outside the full workflow.
+- Research synthesis uses compact upstream context with summaries, bounded claim lists, evidence IDs, and short evidence titles rather than full evidence payloads.
+
 ## Ticket List
 
 ### Ticket 1: Project Scaffold - Complete
@@ -253,6 +264,8 @@ Acceptance criteria:
 - `docs/agent_contracts.md` lists responsibilities and schemas.
 - README includes how to run frontend/backend.
 - Limitations and non-advice disclaimer are clear.
+
+Status: in progress. README and this project plan now document provider selection, LLM debugging, timeout controls, and synthesis prompt compaction. A final MVP documentation review should still reconcile architecture and contract docs before release.
 
 ## MVP Scope
 

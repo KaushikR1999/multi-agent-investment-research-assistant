@@ -161,7 +161,7 @@ Outputs:
 - warnings
 - confidence
 
-The MVP implementation uses an abstract `LLMClient` with an OpenAI-backed concrete client. Tests use fake LLM clients and never call a live LLM.
+The MVP implementation uses an abstract `LLMClient` with OpenAI and Gemini concrete clients selected by `LLM_PROVIDER`. Tests use fake LLM clients and never call a live LLM.
 
 Grounding rules:
 
@@ -242,11 +242,23 @@ Required draft sections:
 
 Grounding rules:
 
-- The prompt supplies only upstream summaries, claims, warnings, and evidence IDs.
+- The prompt supplies compact upstream context: summaries, bounded claim lists, warnings, evidence IDs, and short evidence titles.
 - Every generated claim must cite upstream evidence.
 - Claims with missing or unknown evidence IDs are removed before the draft is returned.
 - Conflicting signals should be represented as tensions, not recommendations.
 - The draft is intentionally unverified; the verifier checks grounding, contradictions, and advice wording in a later step.
+
+The synthesizer prompt size is controlled by `SYNTHESIS_MAX_CLAIMS_PER_OUTPUT` and `SYNTHESIS_MAX_EVIDENCE_ITEMS`. LLM calls are also bounded by `LLM_TIMEOUT_SECONDS` and `LLM_OUTPUT_TOKEN_LIMIT`.
+
+## LLM Client Diagnostics
+
+LLM-backed agents call the shared `LLMClient` with an agent label:
+
+- `news_sentiment`
+- `risk`
+- `research_synthesizer`
+
+Provider calls log input character count, approximate token count, requested output token limit, provider, model, HTTP status, request duration, and normalized error code. This makes timeout, rate limit, authentication, model-name, network, malformed JSON, and provider errors distinguishable during local runs.
 
 ## Verifier Agent
 

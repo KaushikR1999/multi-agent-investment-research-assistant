@@ -107,7 +107,13 @@ class NewsRetrievalService:
     def __init__(self, provider: NewsProvider | None = None) -> None:
         self.provider = provider or NewsAPIProvider()
 
-    def retrieve(self, query: str, page_size: int = 5) -> NewsRetrievalResult:
+    def retrieve(
+        self,
+        query: str,
+        page_size: int = 5,
+        company_name: str | None = None,
+        ticker: str | None = None,
+    ) -> NewsRetrievalResult:
         normalized_query = " ".join(query.strip().split())
         if not normalized_query:
             return NewsRetrievalResult(
@@ -177,6 +183,8 @@ class NewsRetrievalService:
                     published_at=self._parse_published_at(raw_article.published_at),
                     data={
                         "query": normalized_query,
+                        "company_name": company_name,
+                        "ticker": ticker,
                         "title": title,
                         "url": article.url,
                         "publisher": raw_article.publisher,

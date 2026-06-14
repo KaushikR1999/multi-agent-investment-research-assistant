@@ -18,7 +18,7 @@ from backend.app.models.common import (
     Severity,
     StrictBaseModel,
 )
-from backend.app.services.llm import LLMClient, LLMServiceError, OpenAILLMClient
+from backend.app.services.llm import LLMClient, LLMServiceError, build_llm_client
 
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "risk.md"
@@ -45,7 +45,7 @@ class _LLMRiskResponse(StrictBaseModel):
 
 class RiskAgent:
     def __init__(self, llm_client: LLMClient | None = None, prompt_template: str | None = None) -> None:
-        self.llm_client = llm_client or OpenAILLMClient()
+        self.llm_client = llm_client or build_llm_client()
         self.prompt_template = prompt_template if prompt_template is not None else PROMPT_PATH.read_text()
 
     def run(
@@ -73,7 +73,7 @@ class RiskAgent:
 
         prompt = self._build_prompt(market_data, fundamentals, news_sentiment, evidence)
         try:
-            raw_response = self.llm_client.generate_json(prompt)
+            raw_response = self.llm_client.generate_json(prompt, call_name="risk")
             parsed = _LLMRiskResponse.model_validate(raw_response)
         except LLMServiceError as exc:
             warnings.append(
@@ -279,6 +279,6 @@ class RiskAgent:
 
     @staticmethod
     def _severity_for_error_code(code: str) -> Severity:
-        if code in {"missing_api_key", "rate_limited", "auth_error", "network_error", "malformed_json"}:
+        if code in {"missing_api_key", "rate_limited", "auth_error", "network_error", "timeout", "malformed_json"}:
             return Severity.WARNING
         return Severity.ERROR

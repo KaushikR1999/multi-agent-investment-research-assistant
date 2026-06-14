@@ -62,7 +62,7 @@ class ResearchWorkflowNodes:
         worker_calls: dict[str, Callable[[], Any]] = {
             "market_data": lambda: self.dependencies.market_data_agent.run(state.resolved_company),
             "fundamentals": lambda: self.dependencies.fundamentals_agent.run(state.resolved_company),
-            "news_sentiment": lambda: self._run_news_sentiment(state.request.query),
+            "news_sentiment": lambda: self._run_news_sentiment(state),
         }
         updates: dict[str, MarketDataOutput | FundamentalsOutput | NewsSentimentOutput] = {}
         errors = list(state.errors)
@@ -141,6 +141,11 @@ class ResearchWorkflowNodes:
             return "final_response"
         return "parallel_workers"
 
-    def _run_news_sentiment(self, query: str) -> NewsSentimentOutput:
-        retrieval_result = self.dependencies.news_retrieval_service.retrieve(query)
+    def _run_news_sentiment(self, state: ResearchGraphState) -> NewsSentimentOutput:
+        resolved_company = state.resolved_company
+        retrieval_result = self.dependencies.news_retrieval_service.retrieve(
+            state.request.query,
+            company_name=resolved_company.company_name if resolved_company is not None else None,
+            ticker=resolved_company.ticker if resolved_company is not None else None,
+        )
         return self.dependencies.news_sentiment_agent.run(retrieval_result)
