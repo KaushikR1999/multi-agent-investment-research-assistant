@@ -6,7 +6,7 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 11:
+Implemented through Ticket 12:
 
 - Project scaffold, FastAPI health endpoint, and Streamlit placeholder
 - Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
@@ -17,6 +17,7 @@ Implemented through Ticket 11:
 - Draft `InvestmentResearchBrief` generation with evidence-grounded section claims
 - Rule-based verifier for grounding, evidence consistency, contradictions, completeness, and advice wording
 - Typed LangGraph workflow connecting resolver, workers, synthesis, verification, and final response state
+- `POST /research` API endpoint for invoking the workflow
 - Offline tests for implemented services and agents
 
 ## Architecture Progress
@@ -35,10 +36,10 @@ Complete:
 - Draft research synthesizer
 - Verifier Agent
 - LangGraph workflow wiring
+- FastAPI `/research` endpoint
 
 Remaining:
 
-- `POST /research` FastAPI endpoint
 - Streamlit report UI
 - Final MVP documentation pass
 
@@ -69,6 +70,43 @@ Health check:
 ```bash
 curl http://localhost:8000/health
 ```
+
+## API Usage
+
+Create a research brief:
+
+```bash
+curl -X POST http://localhost:8000/research \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Apple"}'
+```
+
+Example response shape:
+
+```json
+{
+  "request_id": "7f0b31f4-6a9c-40f4-9d3d-5f9d0b62b527",
+  "status": "completed",
+  "brief": {
+    "company_name": "Apple Inc.",
+    "ticker": "AAPL",
+    "sections": [],
+    "evidence": [],
+    "verification": {
+      "passed": true,
+      "findings": []
+    },
+    "disclaimer": "This research brief is for informational purposes only and is not financial advice."
+  },
+  "errors": []
+}
+```
+
+Statuses:
+
+- `completed`: final brief exists, verification exists, and no workflow errors were recorded
+- `partial`: final brief exists, but recoverable workflow errors occurred or verification is missing
+- `failed`: no final brief was produced
 
 ## Run Frontend
 

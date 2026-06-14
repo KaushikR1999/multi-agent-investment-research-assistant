@@ -222,7 +222,7 @@ Acceptance criteria:
 - Partial worker failures do not crash the whole report unless ticker resolution fails.
 - Final report includes verification notes.
 
-### Ticket 12: FastAPI Research Endpoint
+### Ticket 12: FastAPI Research Endpoint - Complete
 
 Expose the research API.
 

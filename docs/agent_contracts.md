@@ -291,6 +291,35 @@ The workflow uses `ResearchGraphState` as the shared state object. Nodes update 
 
 Ticker resolution errors stop the graph before worker execution. Downstream worker errors are appended to `state.errors`, and the workflow continues with the best available outputs.
 
+## FastAPI Research Endpoint
+
+`POST /research` accepts `ResearchRequest` and returns `ResearchResponse`.
+
+Request:
+
+```json
+{
+  "query": "Apple"
+}
+```
+
+Response:
+
+```json
+{
+  "request_id": "...",
+  "status": "completed",
+  "brief": {},
+  "errors": []
+}
+```
+
+Status rules:
+
+- `completed`: final brief exists, verification exists, and workflow errors are empty
+- `partial`: final brief exists, but recoverable workflow errors occurred or verification is missing
+- `failed`: no final brief is available
+
 ## Verifier Output
 
 The verifier returns:
