@@ -2,6 +2,22 @@
 
 The MVP uses Pydantic models to keep agent outputs structured, testable, and grounded in evidence.
 
+## LLM Provider Configuration
+
+LLM-backed agents use `LLMClient` implementations selected by `LLM_PROVIDER`:
+
+- `openai`: uses `OPENAI_API_KEY` and `OPENAI_MODEL`
+- `gemini`: uses `GEMINI_API_KEY` and `GEMINI_MODEL`
+
+Shared runtime controls:
+
+- `LLM_TIMEOUT_SECONDS`
+- `LLM_OUTPUT_TOKEN_LIMIT`
+- `SYNTHESIS_MAX_CLAIMS_PER_OUTPUT`
+- `SYNTHESIS_MAX_EVIDENCE_ITEMS`
+
+Tests use fake LLM clients and do not require live provider calls.
+
 ## Evidence
 
 `Evidence` records are the source objects used to ground claims.
@@ -140,6 +156,8 @@ Each raw article is normalized into:
 Each article also becomes one `Evidence` record with `source_type="news"`. The evidence `data` stores the normalized fields, provider name, and raw provider payload when available.
 
 Missing API keys, rate limits, authentication failures, network failures, provider errors, empty results, and unusable articles are represented as warnings in `NewsRetrievalResult`. Tests use fake providers and mocked HTTP responses; no live news API calls are required.
+
+Current retrieval is keyword/provider based. It does not yet perform robust semantic relevance filtering before sentiment analysis.
 
 ## News Sentiment Agent
 

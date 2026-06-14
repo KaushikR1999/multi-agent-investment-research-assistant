@@ -6,13 +6,13 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 13:
+MVP complete through Ticket 14:
 
-- Project scaffold, FastAPI health endpoint, and Streamlit placeholder
+- Project scaffold, FastAPI health endpoint, and Streamlit UI
 - Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
 - Ticker/company resolver
 - Market data and fundamentals agents using `yfinance`
-- News retrieval service using a provider abstraction
+- News retrieval service using a provider abstraction and NewsAPI normalization
 - LLM-backed news sentiment, risk, and research synthesis agents with OpenAI or Gemini provider selection
 - LLM provider diagnostics for provider/model/status/timeout failures and prompt-size logging
 - Draft `InvestmentResearchBrief` generation with evidence-grounded section claims
@@ -22,31 +22,22 @@ Implemented through Ticket 13:
 - Streamlit frontend for submitting queries and viewing reports, evidence, errors, and verification findings
 - Offline tests for implemented services and agents
 
-## Architecture Progress
+## Architecture
 
-Complete:
+```text
+Streamlit frontend
+-> FastAPI POST /research
+-> LangGraph workflow
+-> parse_query
+-> resolve_ticker
+-> parallel workers: market data, fundamentals, news retrieval + sentiment
+-> risk agent
+-> research synthesizer
+-> verifier
+-> final response
+```
 
-- Backend scaffold and health endpoint
-- Streamlit scaffold
-- Structured Pydantic contracts
-- Ticker/company resolution
-- Market data worker
-- Fundamentals worker
-- News retrieval service
-- News sentiment worker
-- Risk worker
-- Draft research synthesizer
-- OpenAI and Gemini LLM clients behind a shared provider interface
-- Standalone configured-provider LLM debug script
-- Configurable LLM timeout/output limits and compact synthesis prompts
-- Verifier Agent
-- LangGraph workflow wiring
-- FastAPI `/research` endpoint
-- Streamlit report UI
-
-Remaining:
-
-- Final MVP documentation pass
+The backend keeps the API thin. Business logic lives in agents, services, and graph nodes. The frontend only submits requests and renders the structured response.
 
 ## Setup
 
@@ -67,6 +58,8 @@ Configure API keys as needed:
 - `SYNTHESIS_MAX_CLAIMS_PER_OUTPUT` and `SYNTHESIS_MAX_EVIDENCE_ITEMS` to compact synthesis prompts
 
 Tests use fakes/mocks and do not require live API keys.
+
+Example `.env` values are provided in `.env.example`.
 
 ## LLM Provider Debugging
 
@@ -130,11 +123,31 @@ Example response shape:
   "brief": {
     "company_name": "Apple Inc.",
     "ticker": "AAPL",
-    "sections": [],
-    "evidence": [],
+    "generated_at": "2026-06-14T10:00:00Z",
+    "sections": [
+      {"heading": "Company / ticker identified", "summary": "Apple Inc. was identified as AAPL.", "claims": []},
+      {"heading": "Market data summary", "summary": "Market data summary.", "claims": []},
+      {"heading": "Recent news sentiment", "summary": "News sentiment summary.", "claims": []},
+      {"heading": "Fundamentals summary", "summary": "Fundamentals summary.", "claims": []},
+      {"heading": "Key risks", "summary": "Risk summary.", "claims": []},
+      {"heading": "Bull case", "summary": "Bull case summary.", "claims": []},
+      {"heading": "Bear case", "summary": "Bear case summary.", "claims": []},
+      {"heading": "Balanced view", "summary": "Balanced view summary.", "claims": []}
+    ],
+    "evidence": [
+      {
+        "id": "company_resolution_1",
+        "source_type": "company_profile",
+        "title": "Ticker resolution",
+        "data": {"ticker": "AAPL"}
+      }
+    ],
     "verification": {
       "passed": true,
-      "findings": []
+      "findings": [],
+      "unsupported_claim_count": 0,
+      "contradiction_count": 0,
+      "advice_wording_count": 0
     },
     "disclaimer": "This research brief is for informational purposes only and is not financial advice."
   },
@@ -148,6 +161,12 @@ Statuses:
 - `partial`: final brief exists, but recoverable workflow errors occurred or verification is missing
 - `failed`: no final brief was produced
 
+## Evidence And Verification
+
+Worker agents return structured claims and evidence IDs. The synthesizer may only cite upstream evidence IDs, and unsupported generated claims are dropped before the draft brief is returned.
+
+The verifier is deterministic and rule-based. It checks report completeness, claim grounding, unknown evidence references, conflicting reuse of evidence IDs, obvious contradiction patterns, direct advice wording, disclaimer presence, and non-empty evidence.
+
 ## Screenshots
 
 Placeholder: add screenshots after the final MVP UI review.
@@ -157,3 +176,19 @@ Placeholder: add screenshots after the final MVP UI review.
 ```bash
 pytest
 ```
+
+## Known Limitations
+
+- This is not financial advice and does not produce buy/sell/hold recommendations.
+- Live results depend on third-party APIs, keys, quotas, and network availability.
+- News retrieval currently normalizes NewsAPI results but does not perform robust semantic relevance filtering.
+- LLM outputs can still be rate-limited, malformed, or unavailable; agents return fallback outputs in those cases.
+- The verifier uses deterministic heuristics, so contradiction detection is intentionally conservative and not exhaustive.
+
+## Future Improvements
+
+- Add stronger company-aware news retrieval and article relevance filtering.
+- Add retry/backoff and provider fallback for LLM rate limits.
+- Cache market/news/LLM responses for local demos.
+- Add richer frontend screenshots and deployment notes.
+- Add iterative synthesis revision after verifier findings.

@@ -88,14 +88,13 @@ The verifier should explicitly check `claim -> evidence` mapping. Every major cl
 - LangGraph for workflow orchestration
 - Pydantic for structured state, agent outputs, and API models
 - `yfinance` for market data and fundamentals
-- News API or web search API for news retrieval
+- NewsAPI.org for news retrieval behind a provider abstraction
 - OpenAI or Gemini API for LLM-based analysis
-- Minimal LangChain only if useful for wrappers or prompt utilities
 - Pytest for backend tests
 
 ## Current Implementation Status
 
-Implemented through the Streamlit MVP flow with additional runtime hardening:
+MVP complete through Ticket 14:
 
 - FastAPI `/research` endpoint and Streamlit UI are wired to the LangGraph workflow.
 - OpenAI and Gemini are available through the shared `LLMClient` interface.
@@ -103,6 +102,7 @@ Implemented through the Streamlit MVP flow with additional runtime hardening:
 - LLM provider calls log agent name, input character count, approximate token count, requested output token limit, provider/model, HTTP status, duration, and normalized error code.
 - `scripts/debug_llm_call.py` performs one configured-provider JSON call for isolating quota, auth, model, or network issues outside the full workflow.
 - Research synthesis uses compact upstream context with summaries, bounded claim lists, evidence IDs, and short evidence titles rather than full evidence payloads.
+- Documentation reflects the current implementation, setup, workflow, agent contracts, known limitations, and future improvements.
 
 ## Ticket List
 
@@ -254,7 +254,7 @@ Acceptance criteria:
 - Errors are shown clearly.
 - Evidence and verification notes are visible.
 
-### Ticket 14: MVP Documentation
+### Ticket 14: MVP Documentation - Complete
 
 Document architecture, agent contracts, setup, and limitations.
 
@@ -265,7 +265,7 @@ Acceptance criteria:
 - README includes how to run frontend/backend.
 - Limitations and non-advice disclaimer are clear.
 
-Status: in progress. README and this project plan now document provider selection, LLM debugging, timeout controls, and synthesis prompt compaction. A final MVP documentation review should still reconcile architecture and contract docs before release.
+Status: complete. README, project plan, architecture notes, and agent contracts document the implemented MVP rather than the original plan where behavior differs.
 
 ## MVP Scope
 
@@ -284,7 +284,7 @@ The MVP should produce an evidence-grounded investment research brief for a stoc
 
 The MVP explicitly does not provide financial advice and must avoid direct buy/sell recommendations. It should prioritize structured outputs, traceable evidence, and verifier-enforced grounding over broad feature coverage.
 
-For the 2-3 day build, iterative revision after verifier feedback is out of scope. The system should run:
+For the MVP, iterative revision after verifier feedback is out of scope. The system runs:
 
 ```text
 Orchestrator
@@ -292,4 +292,20 @@ Orchestrator
 -> Final report
 ```
 
-Iterative refinement can be added after the weekend MVP.
+Iterative refinement can be added in a future version.
+
+## Known Limitations
+
+- The system is informational only and must not be treated as financial advice.
+- Live behavior depends on `yfinance`, NewsAPI, and the configured LLM provider.
+- News retrieval normalizes provider results but does not yet perform robust semantic relevance filtering.
+- LLM calls can be rate-limited, time out, or return malformed output; agents preserve partial results and warnings where possible.
+- Verifier contradiction checks are deterministic heuristics and intentionally conservative.
+
+## Future Improvements
+
+- Add company-aware article relevance filtering before news sentiment analysis.
+- Add retry/backoff, caching, and optional LLM provider fallback.
+- Add iterative revision from verifier findings.
+- Add richer deployment documentation and screenshots.
+- Expand tests around live-provider configuration without requiring live calls.
