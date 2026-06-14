@@ -233,7 +233,7 @@ Acceptance criteria:
 - Handles validation and upstream failures cleanly.
 - Includes request or trace ID.
 
-### Ticket 13: Streamlit Frontend
+### Ticket 13: Streamlit Frontend - Complete
 
 Build a minimal frontend for submitting a query and viewing the report.
 

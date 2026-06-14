@@ -320,6 +320,18 @@ Status rules:
 - `partial`: final brief exists, but recoverable workflow errors occurred or verification is missing
 - `failed`: no final brief is available
 
+## Streamlit Frontend
+
+The Streamlit app calls `POST /research` and renders the returned `ResearchResponse`. It does not duplicate backend analysis logic.
+
+It displays:
+
+- company and ticker
+- required report sections
+- verification status, counters, and findings
+- expandable evidence records
+- workflow errors and failed/partial states
+
 ## Verifier Output
 
 The verifier returns:

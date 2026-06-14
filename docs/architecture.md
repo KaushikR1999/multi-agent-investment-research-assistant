@@ -1,6 +1,6 @@
 # Architecture
 
-The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 12.
+The MVP architecture is documented in `PROJECT_PLAN.md`. Current implementation is complete through Ticket 13.
 
 Implemented:
 
@@ -16,10 +16,10 @@ Implemented:
 - Rule-based verifier agent
 - LangGraph workflow wiring
 - FastAPI `/research` endpoint
+- Streamlit report UI
 
 Remaining:
 
-- Streamlit report UI
 - Final documentation pass
 
 ## Current Workflow
@@ -50,3 +50,15 @@ POST /research
 ```
 
 The endpoint returns `completed`, `partial`, or `failed` based on whether the workflow produced a final brief, verification, and recoverable errors. Business logic remains in the workflow and agents.
+
+## Frontend Boundary
+
+The Streamlit frontend is intentionally thin:
+
+```text
+query input
+-> POST /research
+-> render ResearchResponse
+```
+
+All analysis remains in the backend. The frontend displays report sections, verification counters/findings, evidence records, workflow errors, and failed/partial statuses from the API response.

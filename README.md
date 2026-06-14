@@ -6,7 +6,7 @@ This project is not financial advice. The app is intended to summarize available
 
 ## Current Status
 
-Implemented through Ticket 12:
+Implemented through Ticket 13:
 
 - Project scaffold, FastAPI health endpoint, and Streamlit placeholder
 - Pydantic schemas for requests, graph state, agent outputs, evidence, claims, and reports
@@ -18,6 +18,7 @@ Implemented through Ticket 12:
 - Rule-based verifier for grounding, evidence consistency, contradictions, completeness, and advice wording
 - Typed LangGraph workflow connecting resolver, workers, synthesis, verification, and final response state
 - `POST /research` API endpoint for invoking the workflow
+- Streamlit frontend for submitting queries and viewing reports, evidence, errors, and verification findings
 - Offline tests for implemented services and agents
 
 ## Architecture Progress
@@ -37,10 +38,10 @@ Complete:
 - Verifier Agent
 - LangGraph workflow wiring
 - FastAPI `/research` endpoint
+- Streamlit report UI
 
 Remaining:
 
-- Streamlit report UI
 - Final MVP documentation pass
 
 ## Setup
@@ -59,7 +60,11 @@ Configure API keys as needed:
 
 Tests use fakes/mocks and do not require live API keys.
 
-## Run Backend
+## Local Run Instructions
+
+Start the backend and frontend in separate terminals.
+
+Terminal 1:
 
 ```bash
 uvicorn backend.app.main:app --reload
@@ -70,6 +75,14 @@ Health check:
 ```bash
 curl http://localhost:8000/health
 ```
+
+Terminal 2:
+
+```bash
+streamlit run frontend/app.py
+```
+
+The frontend reads `BACKEND_URL` from the environment and defaults to `http://localhost:8000`.
 
 ## API Usage
 
@@ -108,11 +121,9 @@ Statuses:
 - `partial`: final brief exists, but recoverable workflow errors occurred or verification is missing
 - `failed`: no final brief was produced
 
-## Run Frontend
+## Screenshots
 
-```bash
-streamlit run frontend/app.py
-```
+Placeholder: add screenshots after the final MVP UI review.
 
 ## Tests
 
